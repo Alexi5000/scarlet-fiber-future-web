@@ -84,9 +84,9 @@ const Navbar = () => {
       <nav className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-white shadow-md py-3' : 'bg-transparent py-5'}`}>
         <div className="container mx-auto px-4 lg:px-8">
           <div className="flex justify-between items-center">
-            <Link to="/" className="flex items-center">
-              <span className="font-['Montserrat'] text-xl md:text-2xl font-extrabold text-buckeye-scarlet">BUCKEYE</span>
-              <span className="font-['Montserrat'] text-xl md:text-2xl font-light ml-1 text-buckeye-scarlet">DATACOM</span>
+            <Link to="/" className="flex items-center py-2">
+              <span className="font-['Montserrat'] text-2xl md:text-3xl font-extrabold text-buckeye-scarlet">BUCKEYE</span>
+              <span className="font-['Montserrat'] text-2xl md:text-3xl font-extrabold ml-1 text-buckeye-scarlet">DATACOM</span>
             </Link>
             
             {/* Desktop navigation */}
