@@ -1,7 +1,6 @@
-
 import React, { useState } from 'react';
 
-const HeroAnimationContent = () => {
+const HeroAnimationContent = ({ setIsModalOpen }: { setIsModalOpen: (isOpen: boolean) => void }) => {
   const [isButtonHovered, setIsButtonHovered] = useState(false);
 
   return (
@@ -31,36 +30,30 @@ const HeroAnimationContent = () => {
         </p>
         
         <button
-          className="relative px-12 py-5 font-medium overflow-hidden group animate-fade-in-delay-2"
+          className="relative px-16 py-6 font-medium overflow-hidden group animate-fade-in-delay-2 rounded-md"
           onMouseEnter={() => setIsButtonHovered(true)}
           onMouseLeave={() => setIsButtonHovered(false)}
-          onClick={() => {
-            const element = document.querySelector('#services-section');
-            if (element) {
-              element.scrollIntoView({ behavior: 'smooth' });
-            }
-          }}
+          onClick={() => setIsModalOpen(true)}
         >
           {/* Button background with enhanced contrast */}
-          <div className="absolute inset-0 bg-white/10 backdrop-blur-sm border-2 border-white/20 transition-all duration-300 group-hover:bg-white/15 group-hover:border-buckeye-scarlet/70" />
+          <div className="absolute inset-0 bg-white/10 backdrop-blur-sm border-2 border-white/30 rounded-md transition-all duration-300 group-hover:bg-white/15 group-hover:border-buckeye-scarlet/70" />
           
           {/* Button glow effect */}
-          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-md">
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-buckeye-scarlet/30 to-transparent animate-shimmer-slow" />
           </div>
           
-          {/* Button content with same animation as main title */}
-          <span className="relative z-10 flex items-center gap-3 text-lg tracking-wider uppercase text-transparent bg-clip-text bg-gradient-to-r from-white via-buckeye-scarlet to-white animate-text-shimmer bg-[length:200%_100%]" style={{ 
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent'
-          }}>
-            Start Your Project
+          {/* Button content with improved visibility */}
+          <span className="relative z-10 flex items-center justify-center gap-4 text-lg tracking-wider uppercase text-white font-semibold">
+            <span className="text-white group-hover:text-buckeye-scarlet transition-colors duration-300">
+              Start Your Project
+            </span>
             <svg
-              width="24"
-              height="24"
+              width="20"
+              height="20"
               viewBox="0 0 24 24"
               fill="none"
-              className={`transform transition-transform duration-300 ${isButtonHovered ? 'translate-x-1' : ''}`}
+              className={`text-white group-hover:text-buckeye-scarlet transition-all duration-300 ${isButtonHovered ? 'translate-x-1' : ''}`}
             >
               <path
                 d="M5 12H19M19 12L12 5M19 12L12 19"

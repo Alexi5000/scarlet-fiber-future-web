@@ -10,7 +10,7 @@ import CertificationsSection from '../components/CertificationsSection';
 import ServiceAreaMap from '../components/ServiceAreaMap';
 import CompanyValues from '../components/CompanyValues';
 
-const About = () => {
+const About = ({ setIsModalOpen }: { setIsModalOpen: (isOpen: boolean) => void }) => {
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
@@ -20,7 +20,7 @@ const About = () => {
       <TeamSection />
       <CertificationsSection />
       <ServiceAreaMap />
-      <CompanyValues />
+      <CompanyValues setIsModalOpen={setIsModalOpen} />
       <Footer />
     </div>
   );

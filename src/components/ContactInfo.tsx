@@ -2,7 +2,7 @@
 import React from 'react';
 import { Phone, Mail, MapPin, Clock, Users, Linkedin, Instagram } from 'lucide-react';
 
-const ContactInfo = () => {
+const ContactInfo = ({ setIsModalOpen }: { setIsModalOpen: (isOpen: boolean) => void }) => {
   const contactMethods = [
     {
       icon: <Phone className="w-6 h-6 text-buckeye-scarlet" />,
@@ -49,9 +49,15 @@ const ContactInfo = () => {
           <h2 className="text-3xl md:text-4xl font-bold text-buckeye-black mb-4">
             Get In Touch
           </h2>
-          <p className="text-xl text-buckeye-gray max-w-3xl mx-auto">
+          <p className="text-xl text-buckeye-gray max-w-3xl mx-auto mb-8">
             Ready to start your project? We're here to help with all your data communications needs.
           </p>
+          <button 
+            onClick={() => setIsModalOpen(true)}
+            className="bg-buckeye-scarlet hover:bg-[#990000] text-white font-bold py-3 px-6 rounded-md transition-all duration-300 hover:shadow-lg"
+          >
+            Start Your Project
+          </button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">

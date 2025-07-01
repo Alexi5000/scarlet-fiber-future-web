@@ -2,7 +2,7 @@
 import React from 'react';
 import { Heart, Handshake, Zap, Shield, Users, Target } from 'lucide-react';
 
-const CompanyValues = () => {
+const CompanyValues = ({ setIsModalOpen }: { setIsModalOpen: (isOpen: boolean) => void }) => {
   const values = [
     {
       icon: <Heart className="w-12 h-12 text-buckeye-scarlet" />,
@@ -83,12 +83,12 @@ const CompanyValues = () => {
             <p className="text-gray-100 mb-6 max-w-2xl mx-auto">
               Let us show you how our values translate into exceptional service and results for your business.
             </p>
-            <a 
-              href="#contact"
+            <button 
+              onClick={() => setIsModalOpen(true)}
               className="inline-block bg-white text-buckeye-scarlet px-8 py-3 rounded-md font-medium hover:bg-gray-100 transition-colors"
             >
               Start Your Project Today
-            </a>
+            </button>
           </div>
         </div>
       </div>

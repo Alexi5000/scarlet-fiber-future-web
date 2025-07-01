@@ -7,14 +7,14 @@ import ContactInfo from '../components/ContactInfo';
 import ContactMap from '../components/ContactMap';
 import SecurityHeaders from '../components/SecurityHeaders';
 
-const Contact = () => {
+const Contact = ({ setIsModalOpen }: { setIsModalOpen: (isOpen: boolean) => void }) => {
   return (
     <div className="min-h-screen bg-white">
       <SecurityHeaders />
       <Navbar />
       <div className="pt-24">
         <SecureContactForm />
-        <ContactInfo />
+        <ContactInfo setIsModalOpen={setIsModalOpen} />
         <ContactMap />
       </div>
       <Footer />

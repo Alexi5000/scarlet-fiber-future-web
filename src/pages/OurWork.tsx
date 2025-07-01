@@ -94,7 +94,7 @@ const projects: Project[] = [
 
 const projectTypes: ProjectType[] = ['Data Center', 'Smart Building', 'Network Infrastructure', 'IoT Systems', 'Security Systems', 'Cloud Integration', 'Education/Conservation'];
 
-const OurWork = () => {
+const OurWork = ({ setIsModalOpen }: { setIsModalOpen: (isOpen: boolean) => void }) => {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [activeFilter, setActiveFilter] = useState<ProjectType | 'All'>('All');
 
@@ -173,7 +173,7 @@ const OurWork = () => {
           <p className="text-xl text-buckeye-gray mb-8 max-w-2xl mx-auto">
             Join our growing list of satisfied clients and transform your network infrastructure today.
           </p>
-          <CTAButton variant="primary" size="lg">
+          <CTAButton variant="primary" size="lg" onClick={() => setIsModalOpen(true)}>
             Start Your Project
           </CTAButton>
         </div>

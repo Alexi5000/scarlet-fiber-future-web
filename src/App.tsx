@@ -11,28 +11,35 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import SecurityHeaders from "./components/SecurityHeaders";
+import ProjectInquiryModal from "./components/ProjectInquiryModal";
+import React, { useState } from 'react';
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <SecurityHeaders />
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/services" element={<Services />} />
-          <Route path="/our-work" element={<OurWork />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <SecurityHeaders />
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index setIsModalOpen={setIsModalOpen} />} />
+          <Route path="/services" element={<Services setIsModalOpen={setIsModalOpen} />} />
+          <Route path="/our-work" element={<OurWork setIsModalOpen={setIsModalOpen} />} />
+          <Route path="/about" element={<About setIsModalOpen={setIsModalOpen} />} />
+          <Route path="/contact" element={<Contact setIsModalOpen={setIsModalOpen} />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+        <ProjectInquiryModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;

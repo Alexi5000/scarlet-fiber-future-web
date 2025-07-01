@@ -9,7 +9,7 @@ import SimpleCTA from '../components/SimpleCTA';
 import Footer from '../components/Footer';
 import ScrollIndicator from '../components/ScrollIndicator';
 
-const Index = () => {
+const Index = ({ setIsModalOpen }: { setIsModalOpen: (isOpen: boolean) => void }) => {
   return (
     <div className="min-h-screen overflow-x-hidden">
       <Navbar />
@@ -36,7 +36,7 @@ const Index = () => {
           <WhyChooseUs />
         </div>
         <div className="h-1/4 flex items-center">
-          <SimpleCTA />
+          <SimpleCTA setIsModalOpen={setIsModalOpen} />
         </div>
         <div className="h-1/4">
           <Footer />

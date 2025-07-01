@@ -6,7 +6,7 @@ import Footer from '../components/Footer';
 import CTAButton from '../components/CTAButton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
 
-const Services = () => {
+const Services = ({ setIsModalOpen }: { setIsModalOpen: (isOpen: boolean) => void }) => {
   const [showStickyButton, setShowStickyButton] = useState(false);
 
   useEffect(() => {
@@ -161,7 +161,7 @@ const Services = () => {
                 </div>
                 
                 <div className="mt-8">
-                  <CTAButton variant="primary" size="lg">
+                  <CTAButton variant="primary" size="lg" onClick={() => setIsModalOpen(true)}>
                     Start Your Fiber Project
                   </CTAButton>
                 </div>
@@ -214,7 +214,7 @@ const Services = () => {
                   ))}
                 </div>
                 
-                <CTAButton variant="primary" size="lg">
+                <CTAButton variant="primary" size="lg" onClick={() => setIsModalOpen(true)}>
                   Get Installation Quote
                 </CTAButton>
               </div>
@@ -291,7 +291,7 @@ const Services = () => {
                   ))}
                 </div>
                 
-                <CTAButton variant="primary" size="lg">
+                <CTAButton variant="primary" size="lg" onClick={() => setIsModalOpen(true)}>
                   Implement AI Monitoring
                 </CTAButton>
               </div>
@@ -338,7 +338,7 @@ const Services = () => {
       <div className={`fixed bottom-6 right-6 z-50 transition-all duration-300 ${
         showStickyButton ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-16 pointer-events-none'
       }`}>
-        <CTAButton variant="primary" size="lg" className="shadow-2xl">
+        <CTAButton variant="primary" size="lg" className="shadow-2xl" onClick={() => setIsModalOpen(true)}>
           Start Your Project
         </CTAButton>
       </div>
