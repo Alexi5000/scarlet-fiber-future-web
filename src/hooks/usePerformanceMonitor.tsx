@@ -53,7 +53,7 @@ export const usePerformanceMonitor = () => {
     }
 
     animationIdRef.current = requestAnimationFrame(monitorFPS);
-  }, [calculateFPS, shouldStopMonitoring, performanceState.shouldAutoDegrade, performanceState.deviceCapabilities]);
+  }, [calculateFPS, shouldStopMonitoring, performanceState.shouldAutoDegrade, performanceState.deviceCapabilities, animationIdRef]);
 
   // Start FPS monitoring with device-specific considerations
   const startMonitoring = useCallback(() => {

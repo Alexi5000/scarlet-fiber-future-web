@@ -1,21 +1,25 @@
-
 import { useEffect, useRef } from 'react';
-import { QualityLevel } from './types';
+import { PerformanceState, QualityLevel } from './types';
+
+interface BatteryManager extends EventTarget {
+  charging: boolean;
+  level: number;
+}
 
 export const useBatteryMonitor = (
-  setPerformanceState: React.Dispatch<React.SetStateAction<any>>
+  setPerformanceState: React.Dispatch<React.SetStateAction<PerformanceState>>
 ) => {
-  const batteryApiRef = useRef<any>(null);
+  const batteryApiRef = useRef<BatteryManager | null>(null);
 
   useEffect(() => {
     if ('getBattery' in navigator) {
-      (navigator as any).getBattery().then((battery: any) => {
+      (navigator as Navigator & { getBattery: () => Promise<BatteryManager> }).getBattery().then((battery: BatteryManager) => {
         batteryApiRef.current = battery;
         
         const checkBattery = () => {
           if (battery.level < 0.2 && !battery.charging) {
             console.log('Low battery detected, reducing animation quality');
-            setPerformanceState((prev: any) => ({ 
+            setPerformanceState((prev) => ({ 
               ...prev, 
               currentQuality: prev.currentQuality === 'high' ? 'medium' : 'low'
             }));

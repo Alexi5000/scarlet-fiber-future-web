@@ -1,11 +1,11 @@
 
-import { QualityLevel } from './types';
+import { QualityLevel, DeviceCapabilities } from './types';
 
 export const prefersReducedMotion = (): boolean => {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 };
 
-export const getDeviceSpecificDefaults = (deviceCapabilities: any): QualityLevel => {
+export const getDeviceSpecificDefaults = (deviceCapabilities: DeviceCapabilities): QualityLevel => {
   if (prefersReducedMotion()) return 'static';
   
   const { isMobile, ram, isOldBrowser } = deviceCapabilities;
@@ -16,7 +16,7 @@ export const getDeviceSpecificDefaults = (deviceCapabilities: any): QualityLevel
   return 'high';
 };
 
-export const loadSavedQuality = (deviceCapabilities: any): QualityLevel => {
+export const loadSavedQuality = (deviceCapabilities: DeviceCapabilities): QualityLevel => {
   if (prefersReducedMotion()) return 'static';
   
   const saved = localStorage.getItem('fiber-animation-quality');

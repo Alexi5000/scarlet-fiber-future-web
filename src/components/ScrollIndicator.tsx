@@ -16,7 +16,7 @@ const ScrollIndicator = () => {
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [sections.length]);
 
   const scrollToSection = (index: number) => {
     const element = document.getElementById(sections[index]);

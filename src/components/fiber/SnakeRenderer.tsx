@@ -94,15 +94,15 @@ const SnakeRenderer: React.FC<SnakeRendererProps> = ({
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [isVisible]);
+  }, [isVisible, renderPaths]);
 
-  const renderPaths = (ctx: CanvasRenderingContext2D, pathsToRender: SnakePath[]) => {
+  const renderPaths = useCallback((ctx: CanvasRenderingContext2D, pathsToRender: SnakePath[]) => {
     pathsToRender.forEach(path => {
       renderSnakePath(ctx, path);
     });
-  };
+  }, [renderSnakePath]);
 
-  const renderSnakePath = (ctx: CanvasRenderingContext2D, path: SnakePath) => {
+  const renderSnakePath = useCallback((ctx: CanvasRenderingContext2D, path: SnakePath) => {
     const activeNodes = path.nodes.filter(node => node.isActive && node.intensity > 0);
     
     if (activeNodes.length < 2) return;
@@ -169,7 +169,7 @@ const SnakeRenderer: React.FC<SnakeRendererProps> = ({
 
     // Reset shadow
     ctx.shadowBlur = 0;
-  };
+  }, [isMobile]);
 
   return (
     <canvas

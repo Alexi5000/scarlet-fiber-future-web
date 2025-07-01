@@ -1,4 +1,6 @@
 
+import { DeviceCapabilities } from '../hooks/performance/types';
+
 export interface PerformanceConfig {
   maxPaths: number;
   renderLayers: number;
@@ -10,7 +12,7 @@ export interface PerformanceConfig {
 export const getPerformanceConfig = (
   quality: string,
   isMobile: boolean,
-  deviceCapabilities?: any
+  deviceCapabilities?: DeviceCapabilities
 ): PerformanceConfig => {
   const baseConfig: PerformanceConfig = {
     maxPaths: 8,

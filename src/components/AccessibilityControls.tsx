@@ -2,11 +2,13 @@
 import React, { useState, useEffect } from 'react';
 import { Pause, Play, Settings } from 'lucide-react';
 
+type AnimationQuality = 'high' | 'medium' | 'low' | 'static';
+
 interface AccessibilityControlsProps {
   isPaused: boolean;
   onTogglePause: () => void;
-  quality: 'high' | 'medium' | 'low' | 'static';
-  onQualityChange: (quality: 'high' | 'medium' | 'low' | 'static') => void;
+  quality: AnimationQuality;
+  onQualityChange: (quality: AnimationQuality) => void;
 }
 
 const AccessibilityControls: React.FC<AccessibilityControlsProps> = ({
@@ -66,7 +68,7 @@ const AccessibilityControls: React.FC<AccessibilityControlsProps> = ({
               <label className="text-white text-xs mb-1 block">Quality Level</label>
               <select
                 value={quality}
-                onChange={(e) => onQualityChange(e.target.value as any)}
+                onChange={(e) => onQualityChange(e.target.value as AnimationQuality)}
                 className="w-full bg-white/10 text-white text-xs rounded px-2 py-1 border border-white/20"
                 disabled={prefersReducedMotion}
               >

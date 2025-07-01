@@ -1,5 +1,5 @@
 
-import { EnhancedSnakePath } from '../components/fiber/types/snakeTypes';
+import { EnhancedSnakePath, EnhancedSnakeNode } from '../components/fiber/types/snakeTypes';
 
 export const renderEnhancedPaths = (
   ctx: CanvasRenderingContext2D, 
@@ -157,7 +157,7 @@ export const renderEnhancedPath = (
 
 export const renderEnhancedNode = (
   ctx: CanvasRenderingContext2D, 
-  node: any, 
+  node: EnhancedSnakeNode, 
   path: EnhancedSnakePath,
   isMobile: boolean
 ) => {
