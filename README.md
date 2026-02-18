@@ -1,73 +1,106 @@
-# Welcome to your Lovable project
+<!-- HEADER BANNER -->
+<div align="center">
+  <img src="assets/banner.png" alt="Scarlet Fiber Future Web - TechTide Ohio Next-Gen Web Platform" width="100%"/>
+</div>
 
-## Project info
+<div align="center">
 
-**URL**: https://lovable.dev/projects/6121a679-6ef9-4f64-aa12-555d46066480
+[![TypeScript](https://img.shields.io/badge/-TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/-React-20232A?style=flat-square&logo=react&logoColor=61DAFB)](https://react.dev/)
+[![Vite](https://img.shields.io/badge/-Vite-646CFF?style=flat-square&logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Tailwind](https://img.shields.io/badge/-Tailwind_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![TechTide Ohio](https://img.shields.io/badge/-TechTide_Ohio-D4A843?style=flat-square)](https://github.com/TechTideOhio)
 
-## How can I edit this code?
+</div>
 
-There are several ways of editing your application.
+> **Scarlet Fiber Future Web is TechTide Ohio's next-generation web platform** — a modern, responsive web application built with React, TypeScript, Vite, and Tailwind CSS. Designed as the digital backbone for TechTide's Ohio operations.
 
-**Use Lovable**
+---
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/6121a679-6ef9-4f64-aa12-555d46066480) and start prompting.
+## Overview
 
-Changes made via Lovable will be committed automatically to this repo.
+Scarlet Fiber Future Web serves as the primary web presence and platform for TechTide Ohio. Built with a modern component architecture and optimized for performance, it delivers a fast, accessible, and visually polished experience across all devices.
 
-**Use your preferred IDE**
+## Key Features
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+| Feature | Description |
+|---------|-------------|
+| **Modern Stack** | React 18 + TypeScript + Vite for blazing-fast development and builds |
+| **Responsive Design** | Tailwind CSS with mobile-first responsive layouts |
+| **Component Architecture** | Modular, reusable React components with clean separation of concerns |
+| **Performance Optimized** | Vite's HMR for instant dev feedback, optimized production bundles |
+| **Type Safe** | Full TypeScript coverage for reliability and developer experience |
+| **Accessible** | Built with accessibility best practices and semantic HTML |
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## Quick Start
 
-Follow these steps:
+### Prerequisites
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+Node.js 18+ and npm are required.
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### Installation
 
-# Step 3: Install the necessary dependencies.
-npm i
+```bash
+# Clone the repository
+git clone https://github.com/Alexi5000/scarlet-fiber-future-web.git
+cd scarlet-fiber-future-web
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Install dependencies
+npm install
+
+# Start the development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Visit `http://localhost:5173` to view the application.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Build for Production
 
-**Use GitHub Codespaces**
+```bash
+# Create optimized production build
+npm run build
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+# Preview the production build
+npm run preview
+```
 
-## What technologies are used for this project?
+## Project Structure
 
-This project is built with:
+```
+src/
+├── components/     # Reusable UI components
+├── config/         # Application configuration
+├── hooks/          # Custom React hooks
+├── App.tsx         # Root application component
+├── App.css         # Global styles
+└── main.tsx        # Application entry point
+```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Technology Stack
 
-## How can I deploy this project?
+| Category | Technology |
+|----------|-----------|
+| **Framework** | React 18 |
+| **Language** | TypeScript |
+| **Build Tool** | Vite |
+| **Styling** | Tailwind CSS |
+| **Organization** | TechTide Ohio |
+| **Deployment** | Lovable Cloud |
 
-Simply open [Lovable](https://lovable.dev/projects/6121a679-6ef9-4f64-aa12-555d46066480) and click on Share -> Publish.
+## Contributing
 
-## Can I connect a custom domain to my Lovable project?
+Contributions are welcome. Please open an issue to discuss proposed changes before submitting a pull request.
 
-Yes, you can!
+## License
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+See the [LICENSE](LICENSE) file for details.
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+---
+
+<div align="center">
+
+**Maintained by [Alex Cinovoj](https://alexcinovoj.dev) | [TechTide AI](https://github.com/Alexi5000)**
+
+*A [TechTide Ohio](https://github.com/TechTideOhio) project*
+
+</div>
