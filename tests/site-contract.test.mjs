@@ -50,7 +50,12 @@ test("README provides the verified quickstart and support route", () => {
 });
 
 test("support and security documentation paths are present", () => {
-  for (const policy of ["CONTRIBUTING.md", "SUPPORT.md", "SECURITY.md"]) {
+  for (const policy of [
+    "CODE_OF_CONDUCT.md",
+    "CONTRIBUTING.md",
+    "SUPPORT.md",
+    "SECURITY.md",
+  ]) {
     assert.ok(existsSync(join(repositoryRoot, policy)), `missing policy: ${policy}`);
   }
 });
