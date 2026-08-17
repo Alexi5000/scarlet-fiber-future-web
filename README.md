@@ -17,9 +17,9 @@
 
 ---
 
-## Overview
+## Purpose and use cases
 
-Scarlet Fiber Future Web serves as the primary web presence and platform for TechTide Ohio. Built with a modern component architecture and optimized for performance, it delivers a fast, accessible, and visually polished experience across all devices.
+Scarlet Fiber Future Web is the primary public web experience for TechTide Ohio. It presents the organization’s services, work, background, and contact path through a responsive React application. Use it as the source for developing and validating the website locally, or as the reference implementation for a modern TypeScript, Vite, and Tailwind web presence.
 
 ## Key Features
 
@@ -32,37 +32,25 @@ Scarlet Fiber Future Web serves as the primary web presence and platform for Tec
 | **Type Safe** | Full TypeScript coverage for reliability and developer experience |
 | **Accessible** | Built with accessibility best practices and semantic HTML |
 
-## Quick Start
+## Verified install and use quickstart
 
-### Prerequisites
-
-Node.js 18+ and npm are required.
-
-### Installation
+Use Node.js 20 or newer and npm. The commands below install the locked dependency graph, validate the application contract, and start the local Vite server.
 
 ```bash
-# Clone the repository
 git clone https://github.com/Alexi5000/scarlet-fiber-future-web.git
 cd scarlet-fiber-future-web
 
-# Install dependencies
-npm install
-
-# Start the development server
+npm ci
+npm run build
+npm run lint
+npm run typecheck
+npm run test
 npm run dev
 ```
 
-Visit `http://localhost:5173` to view the application.
+Open `http://localhost:5173` to use the application locally. For a production-like local check after building, run `npm run preview` and open the URL printed by Vite.
 
-### Build for Production
-
-```bash
-# Create optimized production build
-npm run build
-
-# Preview the production build
-npm run preview
-```
+The focused smoke suite verifies the public route map, landing-page composition, README quickstart, and support-documentation paths. Browser-level end-to-end flows remain a suitable follow-up when the deployment environment and analytics/contact integrations are available.
 
 ## Project Structure
 
@@ -87,13 +75,17 @@ src/
 | **Organization** | TechTide Ohio |
 | **Deployment** | Lovable Cloud |
 
+## Support and contact
+
+For a website correction, project inquiry, or collaboration request, open a focused GitHub issue or contact [TechTide AI](https://techtideai.io). Include the page or route involved, the expected visitor outcome, and screenshots or browser details where useful. Do not post credentials, private customer information, or security-sensitive material in public issues. For contribution and security guidance, see [CONTRIBUTING.md](./CONTRIBUTING.md), [SUPPORT.md](./SUPPORT.md), and [SECURITY.md](./SECURITY.md).
+
 ## Contributing
 
-Contributions are welcome. Please open an issue to discuss proposed changes before submitting a pull request.
+Contributions are welcome. Please read [CONTRIBUTING.md](./CONTRIBUTING.md) and open an issue to discuss meaningful changes before submitting a pull request.
 
-## License
+## Licensing
 
-See the [LICENSE](LICENSE) file for details.
+No project-wide license has been published in this repository. Do not assume permission to redistribute the code, visual assets, or brand materials beyond the terms made available by the maintainers.
 
 ---
 

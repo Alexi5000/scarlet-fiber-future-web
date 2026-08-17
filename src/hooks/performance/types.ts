@@ -1,12 +1,16 @@
 
 export type QualityLevel = 'high' | 'medium' | 'low' | 'static';
 
+export type DeviceCapabilities = ReturnType<
+  typeof import('../../utils/deviceDetection').detectDeviceCapabilities
+>;
+
 export interface PerformanceState {
   currentQuality: QualityLevel;
   fps: number;
   isMonitoring: boolean;
   shouldAutoDegrade: boolean;
-  deviceCapabilities: ReturnType<typeof import('../../utils/deviceDetection').detectDeviceCapabilities>;
+  deviceCapabilities: DeviceCapabilities;
   isPaused: boolean;
 }
 

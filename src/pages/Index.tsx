@@ -17,7 +17,7 @@ const Index = ({ setIsModalOpen }: { setIsModalOpen: (isOpen: boolean) => void }
       
       {/* First Viewport: Hero + Navigation */}
       <section id="hero-section" className="h-screen relative">
-        <Hero />
+        <Hero setIsModalOpen={setIsModalOpen} />
       </section>
       
       {/* Second Viewport: Stats + Services */}

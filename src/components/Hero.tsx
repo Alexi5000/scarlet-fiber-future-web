@@ -3,11 +3,15 @@ import React from 'react';
 import EnhancedHero from './EnhancedHero';
 import ResourcePreloader from './ResourcePreloader';
 
-const Hero = () => {
+interface HeroProps {
+  setIsModalOpen: (isOpen: boolean) => void;
+}
+
+const Hero = ({ setIsModalOpen }: HeroProps) => {
   return (
     <>
       <ResourcePreloader />
-      <EnhancedHero />
+      <EnhancedHero setIsModalOpen={setIsModalOpen} />
     </>
   );
 };

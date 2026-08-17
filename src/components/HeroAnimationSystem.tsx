@@ -4,7 +4,11 @@ import HeroAnimationCanvas from './HeroAnimationCanvas';
 import HeroAnimationContent from './HeroAnimationContent';
 import HeroAnimationStyles from './HeroAnimationStyles';
 
-const HeroAnimationSystem = () => {
+interface HeroAnimationSystemProps {
+  setIsModalOpen: (isOpen: boolean) => void;
+}
+
+const HeroAnimationSystem = ({ setIsModalOpen }: HeroAnimationSystemProps) => {
   return (
     <div className="relative min-h-screen bg-black overflow-hidden">
       {/* Clean gradient background */}
@@ -23,7 +27,7 @@ const HeroAnimationSystem = () => {
       />
       
       {/* Hero content */}
-      <HeroAnimationContent />
+      <HeroAnimationContent setIsModalOpen={setIsModalOpen} />
       
       {/* Vignette effect */}
       <div className="absolute inset-0 pointer-events-none bg-radial-gradient from-transparent via-transparent to-black/50" />

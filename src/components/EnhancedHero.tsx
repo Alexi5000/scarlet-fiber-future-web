@@ -2,7 +2,11 @@
 import React, { useEffect, useState } from 'react';
 import HeroAnimationSystem from './HeroAnimationSystem';
 
-const EnhancedHero = () => {
+interface EnhancedHeroProps {
+  setIsModalOpen: (isOpen: boolean) => void;
+}
+
+const EnhancedHero = ({ setIsModalOpen }: EnhancedHeroProps) => {
   const [scrollY, setScrollY] = useState(0);
 
   useEffect(() => {
@@ -21,7 +25,7 @@ const EnhancedHero = () => {
         transform: `translateY(${scrollY * 0.3}px)`,
       }}
     >
-      <HeroAnimationSystem />
+      <HeroAnimationSystem setIsModalOpen={setIsModalOpen} />
     </div>
   );
 };
