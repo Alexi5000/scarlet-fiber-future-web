@@ -1,27 +1,11 @@
+import DOMPurify from 'dompurify';
 
-// XSS Prevention and Input Sanitization Utilities
 export const sanitizeInput = (input: string): string => {
-  // Remove potentially dangerous characters and scripts
-  return input
-    .trim()
-    .replace(/[<>]/g, '') // Remove angle brackets
-    .replace(/javascript:/gi, '') // Remove javascript: protocol
-    .replace(/on\w+\s*=/gi, '') // Remove event handlers
-    .replace(/script/gi, 'blocked') // Replace script tags
-    .replace(/iframe/gi, 'blocked') // Replace iframe tags
-    .replace(/object/gi, 'blocked') // Replace object tags
-    .replace(/embed/gi, 'blocked'); // Replace embed tags
+  return input.trim().replace(/[<>]/g, '');
 };
 
 export const sanitizeHTML = (html: string): string => {
-  // More aggressive HTML sanitization
-  return html
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-    .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
-    .replace(/<object\b[^<]*(?:(?!<\/object>)<[^<]*)*<\/object>/gi, '')
-    .replace(/<embed\b[^<]*>/gi, '')
-    .replace(/javascript:/gi, '')
-    .replace(/on\w+\s*=/gi, '');
+  return DOMPurify.sanitize(html, { USE_PROFILES: { html: true } });
 };
 
 export const validateEmail = (email: string): boolean => {
