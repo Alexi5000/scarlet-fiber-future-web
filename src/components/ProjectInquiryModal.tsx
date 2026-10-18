@@ -1,5 +1,5 @@
 import React from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import ProjectInquiryCard from './ProjectInquiryCard';
 
 interface ProjectInquiryModalProps {
@@ -13,7 +13,8 @@ const ProjectInquiryModal: React.FC<ProjectInquiryModalProps> = ({
 }) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px] p-0">
+      <DialogContent className="sm:max-w-[600px] p-0" aria-describedby={undefined}>
+        <DialogTitle className="sr-only">Start Your Project</DialogTitle>
         <ProjectInquiryCard />
       </DialogContent>
     </Dialog>

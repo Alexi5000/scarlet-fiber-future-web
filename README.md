@@ -34,7 +34,7 @@ Scarlet Fiber Future Web is the primary public web experience for TechTide Ohio.
 
 ## Verified install and use quickstart
 
-Use Node.js 20 or newer and npm. The commands below install the locked dependency graph, validate the application contract, and start the local Vite server.
+Use Node.js 22.12 or newer and npm. The commands below install the locked dependency graph, validate the application contract, and start the local Vite server.
 
 ```bash
 git clone https://github.com/Alexi5000/scarlet-fiber-future-web.git
