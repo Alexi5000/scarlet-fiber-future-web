@@ -36,7 +36,8 @@ test("landing page composes the primary visitor experience", () => {
 
 test("README provides the verified quickstart and support route", () => {
   for (const marker of [
-    "## Purpose and use cases",
+    "## Why this fork exists",
+    "## Upstream",
     "## Verified install and use quickstart",
     "npm ci",
     "npm run build",
