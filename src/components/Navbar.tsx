@@ -1,113 +1,233 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Menu, X, ChevronDown } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
+import { trackNavClick, trackMobileMenuToggle, trackSubmenuClick } from '@/lib/analytics';
+
+type MenuItem = {
+  name: string;
+  href: string;
+  hasDropdown?: boolean;
+  submenu?: { name: string; href: string }[];
+};
+
+const menuItems: MenuItem[] = [
+  { name: 'Home', href: '/' },
+  {
+    name: 'Services',
+    href: '/services',
+    hasDropdown: true,
+    submenu: [
+      { name: 'Structured Fiber Cabling', href: '/services#fiber' },
+      { name: 'Low-Voltage Installations', href: '/services#low-voltage' },
+      { name: 'AI Network Monitoring', href: '/services#ai-monitoring' },
+    ],
+  },
+  { name: 'Our Work', href: '/our-work' },
+  { name: 'About Us', href: '/about' },
+  { name: 'Contact', href: '/contact' },
+];
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isServicesOpen, setIsServicesOpen] = useState(false);
+  const [desktopServicesOpen, setDesktopServicesOpen] = useState(false);
   const location = useLocation();
-  
+  const drawerRef = useRef<HTMLDivElement>(null);
+  const hamburgerRef = useRef<HTMLButtonElement>(null);
+
+  // Only the home route has a dark hero behind a transparent navbar.
+  // Every other page has a light/white top area, so the navbar must render
+  // in its solid white state from the start or the links become invisible.
+  const isHome = location.pathname === '/';
+  const useSolidNav = !isHome || isScrolled;
+
   useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 10) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
-    };
-    
+    const handleScroll = () => setIsScrolled(window.scrollY > 10);
     window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Body scroll lock effect
   useEffect(() => {
-    if (isMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    
-    // Cleanup on unmount
+    document.body.style.overflow = isMenuOpen ? 'hidden' : 'unset';
     return () => {
       document.body.style.overflow = 'unset';
     };
   }, [isMenuOpen]);
 
-  const navLinks = [
-    { name: 'Client Testimonials', href: '#testimonials' },
-  ];
-
-  const menuItems = [
-    { name: 'Home', href: '/' },
-    { 
-      name: 'Services', 
-      href: '/services',
-      hasDropdown: true,
-      submenu: [
-        { name: 'Structured Fiber Cabling', href: '/services#fiber' },
-        { name: 'Low-Voltage Installations', href: '/services#low-voltage' },
-        { name: 'AI Network Monitoring', href: '/services#ai-monitoring' }
-      ]
-    },
-    { name: 'Our Work', href: '/our-work' },
-    { name: 'About Us', href: '/about' },
-    { name: 'Contact', href: '/contact' },
-  ];
-
-  const handleMenuClick = (href: string) => {
+  const closeMenu = useCallback(() => {
     setIsMenuOpen(false);
     setIsServicesOpen(false);
-    
-    // Handle internal links (sections on current page)
-    if (href.startsWith('#')) {
-      const element = document.querySelector(href);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
+    hamburgerRef.current?.focus();
+  }, []);
+
+  // Escape closes the drawer, focus moves in on open and back to the
+  // hamburger on close, and Tab stays trapped inside while open.
+  useEffect(() => {
+
+    if (!isMenuOpen) return;
+
+    const panel = drawerRef.current;
+    const focusables = (): HTMLElement[] => {
+      if (!panel) return [];
+      return Array.from(
+        panel.querySelectorAll<HTMLElement>('a[href], button:not([disabled])')
+      ).filter((el) => el.offsetParent !== null);
+    };
+
+    // The panel animates in, so wait for it to become visible before focusing.
+    const focusTimer = window.setTimeout(() => {
+      const firstLink = panel?.querySelector<HTMLElement>('nav a[href]');
+      (firstLink ?? focusables()[0])?.focus();
+    }, 350);
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        closeMenu();
+        return;
       }
-    }
-    // For routes like '/services', React Router will handle the navigation
-  };
+      if (event.key !== 'Tab') return;
+
+      const items = focusables();
+      if (items.length === 0) return;
+      const firstItem = items[0];
+      const lastItem = items[items.length - 1];
+      const active = document.activeElement as HTMLElement | null;
+
+      if (event.shiftKey && (active === firstItem || !panel?.contains(active))) {
+        event.preventDefault();
+        lastItem.focus();
+      } else if (!event.shiftKey && active === lastItem) {
+        event.preventDefault();
+        firstItem.focus();
+      }
+    };
+
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      window.clearTimeout(focusTimer);
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [isMenuOpen]);
+
 
   const isActiveRoute = (href: string) => {
     if (href === '/' && location.pathname === '/') return true;
-    if (href !== '/' && location.pathname.startsWith(href)) return true;
+    if (href !== '/' && location.pathname.startsWith(href.split('#')[0])) return true;
     return false;
   };
 
+  const handleNavClick = (name: string) => {
+
+    trackNavClick(name, location.pathname);
+    setIsMenuOpen(false);
+    setIsServicesOpen(false);
+    setDesktopServicesOpen(false);
+  };
+
+  const handleMobileMenuToggle = () => {
+    const next = !isMenuOpen;
+    setIsMenuOpen(next);
+    trackMobileMenuToggle(next ? 'open' : 'close');
+  };
+
+  const linkColor = useSolidNav ? 'text-buckeye-gray' : 'text-white';
+  const linkHover = 'hover:text-buckeye-scarlet';
+
+
   return (
     <>
-      <nav className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-white shadow-md py-3' : 'bg-transparent py-5'}`}>
+      <nav
+        id="navigation"
+        className={`fixed w-full z-50 transition-all duration-300 ${
+          useSolidNav ? 'bg-white shadow-md py-3' : 'bg-transparent py-5'
+        }`}
+      >
         <div className="container mx-auto px-4 lg:px-8">
-          <div className="flex justify-between items-center">
-            <Link to="/" className="flex items-center py-2">
-              <span className="font-['Montserrat'] text-2xl md:text-3xl font-extrabold text-buckeye-scarlet">BUCKEYE</span>
-              <span className="font-['Montserrat'] text-2xl md:text-3xl font-extrabold ml-1 text-buckeye-scarlet">DATACOM</span>
+          <div className="flex justify-between items-center gap-6">
+            <Link to="/" className="flex min-h-11 items-baseline shrink-0" onClick={() => handleNavClick('Logo')}>
+              <span className="font-display text-xl md:text-2xl font-semibold text-buckeye-scarlet tracking-tight">
+                Buckeye
+              </span>
+              <span className={`font-display text-xl md:text-2xl font-normal italic ml-1.5 ${useSolidNav ? 'text-buckeye-black/70' : 'text-white/80'}`}>
+                DataCom
+              </span>
             </Link>
-            
-            {/* Desktop navigation */}
-            <div className="hidden lg:flex items-center space-x-8">
-              {navLinks.map((link) => (
-                <a 
-                  key={link.name} 
-                  href={link.href}
-                  className="font-medium text-buckeye-scarlet hover:text-buckeye-scarlet/80 transition-colors animate-pulse-slow"
-                >
-                  {link.name}
-                </a>
-              ))}
+
+            {/* Desktop nav */}
+            <div className="hidden lg:flex items-center gap-1">
+              {menuItems.map((item) =>
+                item.hasDropdown ? (
+                  <div
+                    key={item.name}
+                    className="relative"
+                    onMouseEnter={() => setDesktopServicesOpen(true)}
+                    onMouseLeave={() => setDesktopServicesOpen(false)}
+                  >
+                    <Link
+                      to={item.href}
+                      onClick={() => handleNavClick(item.name)}
+                      className={`flex items-center gap-1 px-3 py-2 min-h-11 text-sm font-medium transition-colors duration-150 link-underline ${linkColor} ${linkHover} ${
+                        isActiveRoute(item.href) ? 'text-buckeye-scarlet' : ''
+                      }`}
+                    >
+                      {item.name}
+                      <ChevronDown size={16} className={`transition-transform duration-200 ${desktopServicesOpen ? 'rotate-180' : ''}`} />
+                    </Link>
+                    {desktopServicesOpen && (
+                      <div className="absolute top-full left-0 pt-2 w-64">
+                        <div className="bg-white rounded-md shadow-lg border border-gray-100 py-2">
+                          {item.submenu?.map((sub) => (
+                            <Link
+                              key={sub.name}
+                              to={sub.href}
+                              onClick={() => {
+                                trackSubmenuClick(item.name, sub.name);
+                                handleNavClick(sub.name);
+                              }}
+                              className="block px-4 py-2 text-sm text-buckeye-gray hover:text-buckeye-scarlet hover:bg-gray-50 active:bg-gray-100 transition-colors duration-150"
+                            >
+                              {sub.name}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <Link
+                    key={item.name}
+                    to={item.href}
+                    onClick={() => handleNavClick(item.name)}
+                    className={`px-3 py-2 min-h-11 inline-flex items-center text-sm font-medium transition-colors duration-150 link-underline ${linkColor} ${linkHover} ${
+                      isActiveRoute(item.href) ? 'text-buckeye-scarlet' : ''
+                    }`}
+                  >
+                    {item.name}
+                  </Link>
+                )
+              )}
+              <Link
+                to="/contact"
+                onClick={() => handleNavClick('Get a Quote')}
+                className="ml-3 inline-flex items-center px-5 py-2.5 min-h-11 bg-buckeye-scarlet text-white text-sm font-semibold rounded-md hover:bg-buckeye-scarlet/90 transition-all duration-200 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-buckeye-scarlet focus-visible:ring-offset-2"
+              >
+                Get a Quote
+              </Link>
             </div>
-            
-            {/* Hamburger button */}
-            <div className="flex items-center">
-              <button 
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className={`p-2 transition-colors ${isScrolled ? 'text-buckeye-gray hover:text-buckeye-scarlet' : 'text-white hover:text-gray-200'}`}
-                aria-label="Toggle menu"
+
+            {/* Mobile hamburger */}
+            <div className="flex items-center lg:hidden">
+              <button
+                ref={hamburgerRef}
+                onClick={handleMobileMenuToggle}
+                className={`p-2 min-w-11 min-h-11 flex items-center justify-center transition-all duration-200 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-buckeye-scarlet focus-visible:ring-offset-2 ${
+                  useSolidNav ? 'text-buckeye-gray hover:text-buckeye-scarlet' : 'text-white hover:text-gray-200'
+                }`}
+                aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+                aria-controls="mobile-menu"
+                aria-expanded={isMenuOpen}
               >
                 <div className="relative w-6 h-6">
                   <span className={`absolute top-1 left-0 w-6 h-0.5 bg-current transition-all duration-300 ${isMenuOpen ? 'rotate-45 translate-y-2' : ''}`} />
@@ -119,40 +239,42 @@ const Navbar = () => {
           </div>
         </div>
       </nav>
-      
-      {/* Full-screen overlay with smooth animations */}
-      <div className={`fixed inset-0 z-40 transition-all duration-500 ease-in-out ${
-        isMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
-      }`}>
-        {/* Dark backdrop */}
-        <div 
-          className={`absolute inset-0 bg-black transition-opacity duration-500 ${
-            isMenuOpen ? 'opacity-50' : 'opacity-0'
-          }`} 
-          onClick={() => setIsMenuOpen(false)} 
+
+      {/* Mobile overlay */}
+      <div
+        className={`fixed inset-0 z-40 lg:hidden transition-all duration-500 ease-in-out ${
+          isMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
+        }`}
+      >
+        <div
+          className={`absolute inset-0 bg-black transition-opacity duration-500 ${isMenuOpen ? 'opacity-50' : 'opacity-0'}`}
+          onClick={closeMenu}
         />
-        
-        {/* Mobile menu content - full screen */}
-        <div className={`absolute inset-0 bg-buckeye-black text-white transform transition-all duration-500 ease-in-out ${
-          isMenuOpen ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'
-        }`}>
+        <div
+          id="mobile-menu"
+          ref={drawerRef}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Site navigation"
+          className={`absolute inset-0 bg-buckeye-black text-white transform transition-all duration-500 ease-in-out ${
+            isMenuOpen ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'
+          }`}
+        >
           <div className="h-full flex flex-col">
-            {/* Header with close button */}
             <div className="flex items-center justify-between p-6 pt-20 border-b border-gray-700">
-              <div className="flex items-center">
-                <span className="text-buckeye-scarlet font-['Montserrat'] text-xl font-extrabold">BUCKEYE</span>
-                <span className="text-buckeye-scarlet font-['Montserrat'] text-xl font-light ml-1">DATACOM</span>
+              <div className="flex items-baseline">
+                <span className="text-buckeye-scarlet font-display text-xl font-semibold tracking-tight">Buckeye</span>
+                <span className="text-white/70 font-display text-xl font-normal italic ml-1.5">DataCom</span>
               </div>
               <button
-                onClick={() => setIsMenuOpen(false)}
-                className="text-white hover:text-buckeye-scarlet transition-colors p-2"
+                onClick={closeMenu}
+                className="text-white hover:text-buckeye-scarlet active:text-buckeye-scarlet transition-all duration-200 active:scale-[0.97] p-2 min-w-11 min-h-11 flex items-center justify-center rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-buckeye-scarlet"
                 aria-label="Close menu"
               >
                 <X size={28} />
               </button>
             </div>
-            
-            {/* Menu items - touch-friendly sizing */}
+
             <nav className="flex-1 px-6 py-8 overflow-y-auto">
               <div className="space-y-2">
                 {menuItems.map((item) => (
@@ -162,43 +284,43 @@ const Navbar = () => {
                         <div className="flex items-center justify-between">
                           <Link
                             to={item.href}
-                            onClick={() => handleMenuClick(item.href)}
-                            className={`flex-1 py-4 px-2 text-xl font-medium transition-colors min-h-[48px] flex items-center ${
-                              isActiveRoute(item.href) 
-                                ? 'text-buckeye-scarlet border-l-4 border-buckeye-scarlet pl-4' 
-                                : 'text-white hover:text-buckeye-scarlet'
+                            onClick={() => handleNavClick(item.name)}
+                            className={`flex-1 py-4 px-2 text-xl font-medium transition-colors duration-150 min-h-[48px] flex items-center border-l-2 border-transparent active:border-buckeye-scarlet active:bg-white/5 ${
+                              isActiveRoute(item.href)
+                                ? 'text-buckeye-scarlet border-l-4 border-buckeye-scarlet pl-4'
+                                : 'text-white hover:text-buckeye-scarlet active:text-buckeye-scarlet'
                             }`}
                           >
                             {item.name}
                           </Link>
                           <button
                             onClick={() => setIsServicesOpen(!isServicesOpen)}
-                            className="p-4 hover:text-buckeye-scarlet transition-colors min-h-[48px] flex items-center"
+                            className="p-4 hover:text-buckeye-scarlet transition-all duration-200 active:scale-[0.97] min-h-[48px] min-w-11 flex items-center"
+                            aria-label="Toggle services submenu"
                           >
-                            <ChevronDown 
-                              size={24} 
+                            <ChevronDown
+                              size={24}
                               className={`transform transition-transform duration-300 ${isServicesOpen ? 'rotate-180' : ''}`}
                             />
                           </button>
                         </div>
-                        
-                        {/* Submenu with smooth animation and indentation */}
-                        <div className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                          isServicesOpen ? 'max-h-64 opacity-100' : 'max-h-0 opacity-0'
-                        }`}>
+                        <div
+                          className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                            isServicesOpen ? 'max-h-64 opacity-100' : 'max-h-0 opacity-0'
+                          }`}
+                        >
                           <div className="pl-8 space-y-1 border-l-2 border-gray-600 ml-2">
-                            {item.submenu?.map((subItem) => (
+                            {item.submenu?.map((sub) => (
                               <Link
-                                key={subItem.name}
-                                to={subItem.href}
-                                onClick={() => handleMenuClick(subItem.href)}
-                                className={`block py-3 px-4 text-lg transition-colors min-h-[48px] flex items-center ${
-                                  isActiveRoute(subItem.href)
-                                    ? 'text-buckeye-scarlet bg-buckeye-scarlet/10'
-                                    : 'text-gray-300 hover:text-white hover:bg-gray-800/50'
-                                }`}
+                                key={sub.name}
+                                to={sub.href}
+                                onClick={() => {
+                                  trackSubmenuClick(item.name, sub.name);
+                                  handleNavClick(sub.name);
+                                }}
+                                className="block py-3 px-4 text-lg transition-colors duration-150 min-h-[48px] flex items-center text-gray-300 border-l-2 border-transparent active:border-buckeye-scarlet hover:text-white active:bg-gray-800/50 hover:bg-gray-800/50"
                               >
-                                {subItem.name}
+                                {sub.name}
                               </Link>
                             ))}
                           </div>
@@ -207,11 +329,11 @@ const Navbar = () => {
                     ) : (
                       <Link
                         to={item.href}
-                        onClick={() => handleMenuClick(item.href)}
-                        className={`block py-4 px-2 text-xl font-medium transition-colors min-h-[48px] flex items-center ${
+                        onClick={() => handleNavClick(item.name)}
+                        className={`block py-4 px-2 text-xl font-medium transition-colors duration-150 min-h-[48px] flex items-center border-l-2 border-transparent active:border-buckeye-scarlet active:bg-white/5 ${
                           isActiveRoute(item.href)
                             ? 'text-buckeye-scarlet border-l-4 border-buckeye-scarlet pl-4'
-                            : 'text-white hover:text-buckeye-scarlet'
+                            : 'text-white hover:text-buckeye-scarlet active:text-buckeye-scarlet'
                         }`}
                       >
                         {item.name}
@@ -219,16 +341,26 @@ const Navbar = () => {
                     )}
                   </div>
                 ))}
+                <Link
+                  to="/contact"
+                  onClick={() => handleNavClick('Get a Quote')}
+                  className="block mt-6 py-4 px-6 text-lg font-semibold text-center bg-buckeye-scarlet text-white rounded-md hover:bg-buckeye-scarlet/90 active:bg-buckeye-scarlet/80 transition-all duration-200 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-buckeye-scarlet focus-visible:ring-offset-2 min-h-[48px]"
+                >
+                  Get a Quote
+                </Link>
               </div>
             </nav>
-            
-            {/* Footer contact info */}
+
             <div className="px-6 py-8 border-t border-gray-700 bg-gray-900/50">
               <div className="space-y-3">
                 <p className="text-gray-400 text-sm font-medium">Get in touch</p>
                 <div className="space-y-2">
-                  <p className="text-white text-lg font-semibold">(614) 679-2486</p>
-                  <p className="text-gray-300">info@buckeyedatacom.com</p>
+                  <a href="tel:+16146792486" className="inline-flex min-h-11 items-center text-white text-lg font-semibold hover:text-buckeye-scarlet active:text-buckeye-scarlet transition-colors">
+                    (614) 679-2486
+                  </a>
+                  <a href="mailto:info@buckeyedatacom.com" className="inline-flex min-h-11 items-center text-gray-300 hover:text-white active:text-white transition-colors">
+                    info@buckeyedatacom.com
+                  </a>
                   <p className="text-gray-400 text-sm">6057 Sweetleaf Ct, Galloway, OH 43119</p>
                 </div>
               </div>

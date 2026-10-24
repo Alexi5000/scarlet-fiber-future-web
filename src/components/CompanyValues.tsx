@@ -56,7 +56,7 @@ const CompanyValues = ({ setIsModalOpen }: { setIsModalOpen: (isOpen: boolean) =
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {values.map((value, index) => (
-            <div key={index} className="bg-white p-8 rounded-lg text-center hover:transform hover:-translate-y-2 transition-all duration-300">
+            <div key={index} className="bg-white p-8 rounded-lg text-center card-interactive">
               <div className="flex justify-center mb-4">
                 {value.icon}
               </div>

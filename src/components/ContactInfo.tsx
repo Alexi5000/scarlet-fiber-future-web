@@ -62,7 +62,7 @@ const ContactInfo = ({ setIsModalOpen }: { setIsModalOpen: (isOpen: boolean) => 
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
           {contactMethods.map((method, index) => (
-            <div key={index} className="bg-white p-8 rounded-lg shadow-md text-center hover:shadow-lg transition-shadow">
+            <div key={index} className="bg-white p-8 rounded-lg shadow-md text-center card-interactive">
               <div className="flex justify-center mb-4">
                 {method.icon}
               </div>
@@ -76,7 +76,7 @@ const ContactInfo = ({ setIsModalOpen }: { setIsModalOpen: (isOpen: boolean) => 
                 href={method.link}
                 target={method.link.startsWith('http') ? '_blank' : undefined}
                 rel={method.link.startsWith('http') ? 'noopener noreferrer' : undefined}
-                className="text-buckeye-scarlet font-medium hover:underline"
+                className="inline-flex min-h-11 items-center text-buckeye-scarlet font-medium transition-colors duration-150 link-underline"
               >
                 {method.content}
               </a>
@@ -109,15 +109,15 @@ const ContactInfo = ({ setIsModalOpen }: { setIsModalOpen: (isOpen: boolean) => 
               </div>
             </div>
             
-            <div className="mt-6 p-4 bg-buckeye-gray rounded-lg">
+            <div className="mt-6 p-4 bg-buckeye-black rounded-lg">
               <div className="flex items-start">
                 <Users className="w-5 h-5 text-buckeye-scarlet mt-0.5 mr-3 flex-shrink-0" />
                 <div>
-                  <p className="text-buckeye-black font-medium mb-1">
+                  <p className="text-white font-medium mb-1">
                     Emergency Support
                   </p>
-                  <p className="text-gray-700 text-sm">
-                    24/7 emergency support available for existing clients. 
+                  <p className="text-gray-200 text-sm">
+                    24/7 emergency support available for existing clients.
                     Call our main number for after-hours assistance.
                   </p>
                 </div>
@@ -143,7 +143,7 @@ const ContactInfo = ({ setIsModalOpen }: { setIsModalOpen: (isOpen: boolean) => 
                       href={social.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`text-buckeye-gray ${social.color} transition-colors p-2 rounded-lg hover:bg-gray-50`}
+                      className={`inline-flex min-h-11 min-w-11 items-center justify-center text-buckeye-gray ${social.color} transition-all duration-200 active:scale-[0.97] p-2 rounded-md hover:bg-gray-50 active:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-buckeye-scarlet focus-visible:ring-offset-2`}
                       aria-label={`Follow us on ${social.name}`}
                     >
                       {social.icon}

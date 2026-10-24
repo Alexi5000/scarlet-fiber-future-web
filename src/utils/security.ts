@@ -1,12 +1,10 @@
-import DOMPurify from 'dompurify';
+import DOMPurify from "dompurify";
 
-export const sanitizeInput = (input: string): string => {
-  return input.trim().replace(/[<>]/g, '');
-};
+export const sanitizeInput = (input: string): string =>
+  DOMPurify.sanitize(input.trim(), { ALLOWED_TAGS: [], ALLOWED_ATTR: [], RETURN_DOM_FRAGMENT: true }).textContent ?? "";
 
-export const sanitizeHTML = (html: string): string => {
-  return DOMPurify.sanitize(html, { USE_PROFILES: { html: true } });
-};
+export const sanitizeHTML = (html: string): string =>
+  DOMPurify.sanitize(html, { USE_PROFILES: { html: true } });
 
 export const validateEmail = (email: string): boolean => {
   const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;

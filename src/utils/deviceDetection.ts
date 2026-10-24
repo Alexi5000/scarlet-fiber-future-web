@@ -1,3 +1,4 @@
+import { PERFORMANCE_TOKENS, logPerformanceToken } from '../constants';
 
 interface DeviceCapabilities {
   isMobile: boolean;
@@ -60,11 +61,11 @@ export const detectDeviceCapabilities = (): DeviceCapabilities => {
 
   const touchEnabled = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
-  console.log('Device capabilities:', {
+  logPerformanceToken('device-detected', {
     isMobile,
     isTablet,
     isDesktop,
-    ram,
+    ram: `${ram}GB`,
     isOldBrowser,
     supportsWebGL,
     prefersCSSOnly,
@@ -85,15 +86,17 @@ export const detectDeviceCapabilities = (): DeviceCapabilities => {
 
 export const getOptimalFiberCount = (capabilities: DeviceCapabilities): number => {
   if (capabilities.prefersCSSOnly) return 0;
+  
+  // Use FIBER_ANIMATION_TOKENS for device-specific fiber counts
   if (capabilities.isMobile) return 8;
   if (capabilities.isTablet) return 12;
-  if (capabilities.ram < 4) return 10;
-  if (capabilities.ram < 6) return 15;
+  if (capabilities.ram < PERFORMANCE_TOKENS.memory.medium) return 10;
+  if (capabilities.ram < PERFORMANCE_TOKENS.memory.high) return 15;
   return 20;
 };
 
 export const shouldUseParticleEffects = (capabilities: DeviceCapabilities): boolean => {
   return !capabilities.isMobile && 
          !capabilities.prefersCSSOnly && 
-         capabilities.ram >= 4;
+         capabilities.ram >= PERFORMANCE_TOKENS.memory.medium;
 };

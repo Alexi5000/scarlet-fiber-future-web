@@ -1,8 +1,7 @@
-
 import React from 'react';
-import HeroAnimationCanvas from './HeroAnimationCanvas';
-import HeroAnimationContent from './HeroAnimationContent';
 import HeroAnimationStyles from './HeroAnimationStyles';
+import HeroAnimationContent from './HeroAnimationContent';
+import { COLOR_TOKENS } from '../constants';
 
 interface HeroAnimationSystemProps {
   setIsModalOpen: (isOpen: boolean) => void;
@@ -11,21 +10,18 @@ interface HeroAnimationSystemProps {
 const HeroAnimationSystem = ({ setIsModalOpen }: HeroAnimationSystemProps) => {
   return (
     <div className="relative min-h-screen bg-black overflow-hidden">
-      {/* Clean gradient background */}
+      {/* Static gradient background */}
       <div className="absolute inset-0 bg-gradient-to-b from-black via-gray-950 to-black" />
-      
-      {/* Canvas for fiber animations */}
-      <HeroAnimationCanvas />
-      
-      {/* Subtle grid - Updated to Buckeye red */}
-      <div 
+
+      {/* Subtle scarlet radial */}
+      <div
         className="absolute inset-0 opacity-[0.02]"
         style={{
-          backgroundImage: 'radial-gradient(circle at center, transparent 0%, rgba(187, 0, 0, 0.5) 100%)',
-          backgroundSize: '100% 100%'
+          backgroundImage: `radial-gradient(circle at center, transparent 0%, ${COLOR_TOKENS.buckeye.scarlet} 100%)`,
+          backgroundSize: '100% 100%',
         }}
       />
-      
+
       {/* Hero content */}
       <HeroAnimationContent setIsModalOpen={setIsModalOpen} />
       

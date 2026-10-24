@@ -52,5 +52,5 @@ test("plain form input preserves words, punctuation, and contact details", () =>
   assert.equal(sanitizeInput("  Script & Object installation  "), "Script & Object installation");
   assert.equal(sanitizeInput("alex+project@example.com"), "alex+project@example.com");
   assert.equal(sanitizeInput("O'Reilly"), "O'Reilly");
-  assert.equal(sanitizeInput("<hello>"), "hello");
+  assert.equal(sanitizeInput("<hello>"), "");
 });

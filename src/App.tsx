@@ -1,45 +1,111 @@
-
+import { useState } from 'react';
+import ProjectInquiryModal from './components/ProjectInquiryModal';
+import { Toaster as Sonner } from '@/components/ui/sonner';
 import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HelmetProvider } from 'react-helmet-async';
+import { AuthProvider } from "./contexts/AuthContext";
 import Index from "./pages/Index";
 import Services from "./pages/Services";
 import OurWork from "./pages/OurWork";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
+import Login from "./pages/Login";
+import AdminDashboard from "./pages/admin/Dashboard";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
 import NotFound from "./pages/NotFound";
 import SecurityHeaders from "./components/SecurityHeaders";
-import ProjectInquiryModal from "./components/ProjectInquiryModal";
-import React, { useState } from 'react';
+import { OrganizationSchema, WebsiteSchema } from "./components/StructuredData";
+import ErrorBoundary from "./components/ErrorBoundary";
+import PageErrorBoundary from "./components/PageErrorBoundary";
+import ProtectedRoute from "./components/ProtectedRoute";
+
+import { AnnouncerProvider } from "./components/Announcer";
 
 const queryClient = new QueryClient();
 
 const App = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   return (
+  <HelmetProvider>
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <SecurityHeaders />
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index setIsModalOpen={setIsModalOpen} />} />
-          <Route path="/services" element={<Services setIsModalOpen={setIsModalOpen} />} />
-          <Route path="/our-work" element={<OurWork setIsModalOpen={setIsModalOpen} />} />
-          <Route path="/about" element={<About setIsModalOpen={setIsModalOpen} />} />
-          <Route path="/contact" element={<Contact setIsModalOpen={setIsModalOpen} />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-        <ProjectInquiryModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+        <ErrorBoundary>
+          <BrowserRouter>
+            <AuthProvider>
+              <SecurityHeaders />
+              <OrganizationSchema />
+              <WebsiteSchema />
+              <Toaster />
+              <Sonner />
+              <ProjectInquiryModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+              
+              <AnnouncerProvider>
+                <Routes>
+                  <Route path="/" element={
+                    <PageErrorBoundary pageName="Home">
+                      <Index setIsModalOpen={setIsModalOpen} />
+                    </PageErrorBoundary>
+                  } />
+                  <Route path="/services" element={
+                    <PageErrorBoundary pageName="Services">
+                      <Services setIsModalOpen={setIsModalOpen} />
+                    </PageErrorBoundary>
+                  } />
+                  <Route path="/our-work" element={
+                    <PageErrorBoundary pageName="Our Work">
+                      <OurWork setIsModalOpen={setIsModalOpen} />
+                    </PageErrorBoundary>
+                  } />
+                  <Route path="/about" element={
+                    <PageErrorBoundary pageName="About">
+                      <About setIsModalOpen={setIsModalOpen} />
+                    </PageErrorBoundary>
+                  } />
+                  <Route path="/contact" element={
+                    <PageErrorBoundary pageName="Contact">
+                      <Contact setIsModalOpen={setIsModalOpen} />
+                    </PageErrorBoundary>
+                  } />
+                  <Route path="/login" element={
+                    <PageErrorBoundary pageName="Login">
+                      <Login />
+                    </PageErrorBoundary>
+                  } />
+                  <Route path="/privacy" element={
+                    <PageErrorBoundary pageName="Privacy">
+                      <Privacy />
+                    </PageErrorBoundary>
+                  } />
+                  <Route path="/terms" element={
+                    <PageErrorBoundary pageName="Terms">
+                      <Terms />
+                    </PageErrorBoundary>
+                  } />
+                  <Route path="/admin" element={
+                    <ProtectedRoute requireAdmin>
+                      <PageErrorBoundary pageName="Admin Dashboard">
+                        <AdminDashboard />
+                      </PageErrorBoundary>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="*" element={
+                    <PageErrorBoundary pageName="Not Found">
+                      <NotFound />
+                    </PageErrorBoundary>
+                  } />
+                </Routes>
+              </AnnouncerProvider>
+            </AuthProvider>
+          </BrowserRouter>
+        </ErrorBoundary>
       </TooltipProvider>
     </QueryClientProvider>
-  );
+  </HelmetProvider>
+);
 };
 
 export default App;

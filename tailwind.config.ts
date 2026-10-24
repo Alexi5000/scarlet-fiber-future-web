@@ -1,4 +1,5 @@
 
+import type { Config } from "tailwindcss";
 import tailwindcssAnimate from "tailwindcss-animate";
 
 export default {
@@ -19,6 +20,11 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				display: ['Fraunces', 'ui-serif', 'Georgia', 'serif'],
+				serif: ['Fraunces', 'ui-serif', 'Georgia', 'serif'],
+				sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
@@ -28,7 +34,8 @@ export default {
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
 					foreground: 'hsl(var(--primary-foreground))'
-				},				secondary: {
+				},
+				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
 					foreground: 'hsl(var(--secondary-foreground))'
 				},
