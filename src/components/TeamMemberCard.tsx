@@ -1,0 +1,53 @@
+import React from 'react';
+import { Linkedin } from 'lucide-react';
+import { Tables } from '@/integrations/supabase/types';
+import { OptimizedImage } from '@/components/ui/optimized-image';
+import teamFallback from '@/assets/team-fallback.jpg';
+
+type TeamMember = Tables<"team_members">;
+
+type TeamMemberCardProps = {
+  member: TeamMember;
+};
+
+const TeamMemberCard = ({ member }: TeamMemberCardProps) => {
+  const imageUrl = member.image_url || teamFallback;
+
+  return (
+    <article 
+      className="bg-white rounded-lg shadow-md overflow-hidden card-interactive"
+      aria-label={`Team member: ${member.name}, ${member.role}`}
+    >
+      <div className="aspect-square overflow-hidden">
+        <OptimizedImage
+          src={imageUrl}
+          alt={`${member.name}, ${member.role} at Buckeye DataCom`}
+          className="w-full h-full"
+          width={300}
+          aspectRatio="1/1"
+        />
+      </div>
+      <div className="p-4 text-center">
+        <h3 className="text-lg font-bold text-buckeye-black">{member.name}</h3>
+        <p className="text-buckeye-scarlet font-medium text-sm mb-2">{member.role}</p>
+        {member.bio && (
+          <p className="text-gray-600 text-sm line-clamp-3">{member.bio}</p>
+        )}
+        {member.linkedin_url && (
+          <a
+            href={member.linkedin_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 mt-3 text-buckeye-gray hover:text-buckeye-scarlet transition-colors duration-150 link-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-buckeye-scarlet focus-visible:ring-offset-2 rounded-md"
+            aria-label={`Connect with ${member.name} on LinkedIn`}
+          >
+            <Linkedin size={18} aria-hidden="true" />
+            <span className="text-sm">Connect</span>
+          </a>
+        )}
+      </div>
+    </article>
+  );
+};
+
+export default TeamMemberCard;

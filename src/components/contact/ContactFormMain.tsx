@@ -1,16 +1,20 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Loader2 } from 'lucide-react';
 import { validateEmail, validatePhone, sanitizeInput, validateTextLength } from './ContactFormValidation';
 import { FormData, FormErrors } from './types';
+import { supabase } from '@/integrations/supabase/client';
+import { trackFormStart, trackFormSubmission, trackFormError } from '@/lib/analytics';
 
 const ContactFormMain = () => {
   const { toast } = useToast();
+  const hasTrackedStart = useRef(false);
+  
   const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
@@ -18,6 +22,9 @@ const ContactFormMain = () => {
     company: '',
     message: ''
   });
+  
+  // Honeypot field for bot detection (invisible to real users)
+  const [honeypot, setHoneypot] = useState('');
   
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -70,6 +77,12 @@ const ContactFormMain = () => {
     const { name, value } = e.target;
     const sanitizedValue = sanitizeInput(value);
     
+    // Track form start on first interaction
+    if (!hasTrackedStart.current) {
+      trackFormStart('contact_form');
+      hasTrackedStart.current = true;
+    }
+    
     setFormData({
       ...formData,
       [name]: sanitizedValue
@@ -84,7 +97,7 @@ const ContactFormMain = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Rate limiting check (simple frontend implementation)
@@ -112,6 +125,14 @@ const ContactFormMain = () => {
 
     if (!validateForm()) {
       setSubmitAttempts(prev => prev + 1);
+      
+      // Track validation errors
+      Object.entries(errors).forEach(([field, error]) => {
+        if (error) {
+          trackFormError('contact_form', field, error);
+        }
+      });
+      
       toast({
         title: "Validation Error",
         description: "Please correct the errors below and try again.",
@@ -121,15 +142,63 @@ const ContactFormMain = () => {
       return;
     }
 
+    // Honeypot check - if filled, silently reject (bots fill hidden fields)
+    if (honeypot) {
+      console.log('Honeypot triggered - rejecting submission');
+      toast({
+        title: "Message sent successfully!",
+        description: "We'll get back to you within 24 hours.",
+        duration: 5000,
+      });
+      // Fake success to not alert bots
+      setFormData({ name: '', email: '', phone: '', company: '', message: '' });
+      return;
+    }
+
     setIsSubmitting(true);
     setLastSubmitTime(now);
     setSubmitAttempts(prev => prev + 1);
 
-    // Simulate form submission
-    setTimeout(() => {
+    try {
+      const { error } = await supabase
+        .from('contact_submissions')
+        .insert({
+          name: formData.name.trim(),
+          email: formData.email.trim().toLowerCase(),
+          phone: formData.phone?.trim() || null,
+          company: formData.company?.trim() || null,
+          message: formData.message.trim(),
+        });
+
+      if (error) {
+        throw error;
+      }
+
+      // Send email notifications (don't block on failure)
+      try {
+        await supabase.functions.invoke('send-contact-email', {
+          body: {
+            name: formData.name.trim(),
+            email: formData.email.trim().toLowerCase(),
+            phone: formData.phone?.trim() || null,
+            company: formData.company?.trim() || null,
+            message: formData.message.trim(),
+          },
+        });
+      } catch (emailError) {
+        console.error('Email notification failed:', emailError);
+        // Don't fail the submission if email fails
+      }
+
+      // Track successful submission
+      trackFormSubmission('contact_form', true, {
+        has_phone: !!formData.phone,
+        has_company: !!formData.company,
+      });
+
       toast({
-        title: "Form submitted successfully!",
-        description: "We'll contact you soon about your inquiry.",
+        title: "Message sent successfully!",
+        description: "We'll get back to you within 24 hours.",
         duration: 5000,
       });
       
@@ -142,9 +211,34 @@ const ContactFormMain = () => {
       });
       
       setErrors({});
-      setIsSubmitting(false);
       setSubmitAttempts(0);
-    }, 1000);
+      hasTrackedStart.current = false; // Reset for next submission
+    } catch (error) {
+      console.error('Error submitting contact form:', error);
+      
+      // Track failed submission
+      trackFormSubmission('contact_form', false);
+      
+      toast({
+        title: "Submission failed",
+        description: "There was an error sending your message. Please try again.",
+        variant: "destructive",
+        duration: 5000,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // On phones the on-screen keyboard can cover the focused field, so bring it
+  // into the middle of the visible viewport when it receives focus.
+  const handleFieldFocus = (
+    event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const target = event.currentTarget;
+    window.setTimeout(() => {
+      target.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }, 250);
   };
 
   return (
@@ -160,6 +254,7 @@ const ContactFormMain = () => {
             <Input
               id="name"
               name="name"
+              autoComplete="name" onFocus={handleFieldFocus}
               placeholder="Enter your name"
               required
               value={formData.name}
@@ -168,6 +263,7 @@ const ContactFormMain = () => {
               aria-describedby={errors.name ? "name-error" : undefined}
               className={errors.name ? "border-red-500 focus:border-red-500" : ""}
               maxLength={100}
+              disabled={isSubmitting}
             />
             {errors.name && (
               <div id="name-error" className="flex items-center gap-1 text-sm text-red-600" role="alert">
@@ -184,6 +280,7 @@ const ContactFormMain = () => {
             <Input
               id="email"
               name="email"
+              autoComplete="email" inputMode="email" onFocus={handleFieldFocus}
               type="email"
               placeholder="Enter your email"
               required
@@ -193,6 +290,7 @@ const ContactFormMain = () => {
               aria-describedby={errors.email ? "email-error" : undefined}
               className={errors.email ? "border-red-500 focus:border-red-500" : ""}
               maxLength={254}
+              disabled={isSubmitting}
             />
             {errors.email && (
               <div id="email-error" className="flex items-center gap-1 text-sm text-red-600" role="alert">
@@ -209,6 +307,7 @@ const ContactFormMain = () => {
             <Input
               id="phone"
               name="phone"
+              autoComplete="tel" inputMode="tel" onFocus={handleFieldFocus}
               type="tel"
               placeholder="Enter your phone number"
               value={formData.phone}
@@ -217,6 +316,7 @@ const ContactFormMain = () => {
               aria-describedby={errors.phone ? "phone-error" : undefined}
               className={errors.phone ? "border-red-500 focus:border-red-500" : ""}
               maxLength={20}
+              disabled={isSubmitting}
             />
             {errors.phone && (
               <div id="phone-error" className="flex items-center gap-1 text-sm text-red-600" role="alert">
@@ -231,6 +331,7 @@ const ContactFormMain = () => {
             <Input
               id="company"
               name="company"
+              autoComplete="organization" onFocus={handleFieldFocus}
               placeholder="Enter your company name"
               value={formData.company}
               onChange={handleChange}
@@ -238,6 +339,7 @@ const ContactFormMain = () => {
               aria-describedby={errors.company ? "company-error" : undefined}
               className={errors.company ? "border-red-500 focus:border-red-500" : ""}
               maxLength={100}
+              disabled={isSubmitting}
             />
             {errors.company && (
               <div id="company-error" className="flex items-center gap-1 text-sm text-red-600" role="alert">
@@ -255,6 +357,7 @@ const ContactFormMain = () => {
           <Textarea
             id="message"
             name="message"
+            onFocus={handleFieldFocus}
             placeholder="Tell us about your project or requirements (minimum 10 characters)"
             rows={4}
             required
@@ -264,6 +367,7 @@ const ContactFormMain = () => {
             aria-invalid={!!errors.message}
             aria-describedby={errors.message ? "message-error" : "message-help"}
             maxLength={2000}
+            disabled={isSubmitting}
           />
           <div id="message-help" className="text-sm text-gray-500">
             {formData.message.length}/2000 characters
@@ -278,14 +382,35 @@ const ContactFormMain = () => {
         
         <Button 
           type="submit" 
-          className="w-full bg-buckeye-scarlet text-white hover:bg-buckeye-scarlet/90 disabled:opacity-50"
+          className="w-full min-h-11 text-sm font-semibold rounded-md bg-buckeye-scarlet text-white hover:bg-buckeye-scarlet/90 glow-brand disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={isSubmitting}
           aria-describedby="submit-help"
         >
-          {isSubmitting ? 'Submitting...' : 'Submit Request'}
+          {isSubmitting ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Submitting...
+            </>
+          ) : (
+            'Submit Request'
+          )}
         </Button>
         <div id="submit-help" className="text-sm text-gray-500 text-center">
           * Required fields. We'll respond within 24 hours.
+        </div>
+        
+        {/* Honeypot field - hidden from real users, bots will fill it */}
+        <div className="absolute -left-[9999px] opacity-0 pointer-events-none" aria-hidden="true">
+          <label htmlFor="website">Website</label>
+          <input
+            type="text"
+            id="website"
+            name="website"
+            value={honeypot}
+            onChange={(e) => setHoneypot(e.target.value)}
+            tabIndex={-1}
+            autoComplete="off"
+          />
         </div>
       </form>
     </div>

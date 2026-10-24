@@ -5,13 +5,34 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import CTAButton from '../components/CTAButton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
+import { LAYOUT_TOKENS, logLayoutToken } from '../constants';
+import SEO from '../components/SEO';
+import { ServiceSchema, BreadcrumbSchema } from '../components/StructuredData';
+import { SEO_CONFIG } from '../config/seo';
+
+const servicesData = [
+  {
+    name: 'Structured Fiber Cabling',
+    description: 'Enterprise-grade fiber optic infrastructure delivering unmatched reliability and performance with lightning-fast data transmission and minimal latency.'
+  },
+  {
+    name: 'Low-Voltage Installations',
+    description: 'Comprehensive low-voltage solutions including voice/data systems, security cameras, access control, and building automation.'
+  },
+  {
+    name: 'AI-Driven Network Monitoring',
+    description: 'Intelligent monitoring using advanced AI algorithms to analyze performance, predict issues, and automatically optimize traffic flow.'
+  }
+];
 
 const Services = ({ setIsModalOpen }: { setIsModalOpen: (isOpen: boolean) => void }) => {
   const [showStickyButton, setShowStickyButton] = useState(false);
 
   useEffect(() => {
+    logLayoutToken('sticky-threshold', LAYOUT_TOKENS.scroll.stickyButtonThreshold);
+    
     const handleScroll = () => {
-      if (window.scrollY > 500) {
+      if (window.scrollY > LAYOUT_TOKENS.scroll.stickyButtonThreshold) {
         setShowStickyButton(true);
       } else {
         setShowStickyButton(false);
@@ -108,12 +129,25 @@ const Services = ({ setIsModalOpen }: { setIsModalOpen: (isOpen: boolean) => voi
 
   return (
     <div className="min-h-screen bg-white">
-      <Navbar />
+      <SEO 
+        title={SEO_CONFIG.pages.services.title}
+        description={SEO_CONFIG.pages.services.description}
+        keywords={SEO_CONFIG.pages.services.keywords}
+        canonicalUrl="/services"
+      />
+      <ServiceSchema services={servicesData} />
+      <BreadcrumbSchema items={[
+        { name: 'Home', url: '/' },
+        { name: 'Services', url: '/services' }
+      ]} />
       
+      <Navbar />
+
+      <main id="main-content">
       {/* Header */}
-      <section className="bg-buckeye-black text-white py-16 mt-16">
+      <section className="bg-buckeye-black text-white pt-32 pb-16">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">Our Services</h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-6">Network Infrastructure &amp; Fiber Cabling Services</h1>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
             Comprehensive network infrastructure solutions designed to power your business forward
           </p>
@@ -121,7 +155,7 @@ const Services = ({ setIsModalOpen }: { setIsModalOpen: (isOpen: boolean) => voi
       </section>
 
       {/* Service 1: Structured Fiber Cabling */}
-      <section className="py-20 bg-white">
+      <section id="fiber" className="py-20 bg-white scroll-mt-24">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
             <div className="flex items-center mb-8">
@@ -172,7 +206,7 @@ const Services = ({ setIsModalOpen }: { setIsModalOpen: (isOpen: boolean) => voi
       </section>
 
       {/* Service 2: Low-Voltage Installations */}
-      <section className="py-20 bg-gray-50">
+      <section id="low-voltage" className="py-20 bg-gray-50 scroll-mt-24">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
             <div className="flex items-center mb-8">
@@ -224,7 +258,7 @@ const Services = ({ setIsModalOpen }: { setIsModalOpen: (isOpen: boolean) => voi
       </section>
 
       {/* Service 3: AI-Driven Network Monitoring */}
-      <section className="py-20 bg-white">
+      <section id="ai-monitoring" className="py-20 bg-white scroll-mt-24">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
             <div className="flex items-center mb-8">
@@ -333,6 +367,8 @@ const Services = ({ setIsModalOpen }: { setIsModalOpen: (isOpen: boolean) => voi
           </div>
         </div>
       </section>
+
+      </main>
 
       {/* Sticky CTA Button */}
       <div className={`fixed bottom-6 right-6 z-50 transition-all duration-300 ${

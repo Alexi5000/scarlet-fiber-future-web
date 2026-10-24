@@ -1,12 +1,11 @@
-
 import React from 'react';
-import CTAButton from './CTAButton';
+import { Link } from 'react-router-dom';
 
 const SimpleCTA = ({ setIsModalOpen }: { setIsModalOpen: (isOpen: boolean) => void }) => {
   return (
-    <section className="w-full bg-white py-16">
+    <section className="w-full bg-white py-16" aria-labelledby="simple-cta-heading">
       <div className="container mx-auto px-4 text-center">
-        <h2 className="text-2xl md:text-3xl font-bold text-buckeye-black mb-6">
+        <h2 id="simple-cta-heading" className="text-2xl md:text-3xl font-bold text-buckeye-black mb-6">
           Ready to transform your network?
         </h2>
         <button 

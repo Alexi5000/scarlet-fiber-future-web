@@ -1,5 +1,6 @@
 
 import { EnhancedSnakePath, EnhancedSnakeNode } from '../types/snakeTypes';
+import { FIBER_ANIMATION_TOKENS, ANIMATION_TOKENS, logFiberToken } from '../../../constants';
 
 export const updatePathNodes = (
   path: EnhancedSnakePath,
@@ -17,16 +18,22 @@ export const updatePathNodes = (
     // CRITICAL FIX: Calculate intensity with guaranteed minimum visibility
     let intensity = 0;
     if (isInSegment) {
-      const baseIntensity = Math.max(0.2, 1 - (distanceFromActive / path.segmentLength));
-      // Reduced pulse effect speed by 50% - was 0.003, now 0.0015
-      const pulseEffect = Math.sin(time * 0.0015 + node.pulsePhase) * 0.3 + 0.7;
+      const baseIntensity = Math.max(
+        FIBER_ANIMATION_TOKENS.node.minIntensity, 
+        1 - (distanceFromActive / path.segmentLength)
+      );
+      
+      const pulseEffect = Math.sin(
+        time * FIBER_ANIMATION_TOKENS.pulse.speed + node.pulsePhase
+      ) * FIBER_ANIMATION_TOKENS.pulse.amplitude + FIBER_ANIMATION_TOKENS.pulse.offset;
+      
       intensity = baseIntensity * pulseEffect * node.connectionStrength;
       
       // Hero synchronization effect
-      intensity += heroGlowIntensity * 0.4;
+      intensity += heroGlowIntensity * FIBER_ANIMATION_TOKENS.glow.heroBoost;
       
       // CRITICAL FIX: Ensure minimum visibility for active nodes
-      intensity = Math.max(intensity, 0.4);
+      intensity = Math.max(intensity, FIBER_ANIMATION_TOKENS.node.minVisibility);
     }
     
     return {
@@ -44,18 +51,33 @@ export const calculateNextSegmentIndex = (
   deltaTime: number,
   nodeCount: number
 ): number => {
-  // CRITICAL FIX: Ensure smooth, predictable progression with minimum speed
-  const baseSpeed = Math.max(speed, 0.25); // Reduced from 0.5 to 0.25 (50% slower)
-  const speedMultiplier = pathType === 'main' ? 0.3 : 0.4; // Reduced multipliers by 50%
+  // Ensure smooth, predictable progression with minimum speed
+  const baseSpeed = Math.max(speed, FIBER_ANIMATION_TOKENS.speed.base.min);
+  const speedMultiplier = pathType === 'main' 
+    ? FIBER_ANIMATION_TOKENS.speed.multiplier.main 
+    : FIBER_ANIMATION_TOKENS.speed.multiplier.branch;
   
-  // CRITICAL FIX: Use consistent time-based progression that's more visible
-  const progressionRate = baseSpeed * speedMultiplier * deltaTime * 0.001; // Reduced from 0.002 to 0.001
+  // Apply master speed controls: global × fiber.snake × progression
+  const masterSpeedMultiplier = ANIMATION_TOKENS.masterSpeed.global * ANIMATION_TOKENS.masterSpeed.fiber.snake;
+  const progressionRate = baseSpeed * speedMultiplier * deltaTime * FIBER_ANIMATION_TOKENS.speed.progression * masterSpeedMultiplier;
   let nextIndex = currentIndex + progressionRate;
   
-  // CRITICAL FIX: Proper wraparound ensuring continuous animation
+  // Log snake movement periodically (every ~120 frames at 60fps)
+  const shouldLog = Math.random() < 0.008; // ~1/120 chance
+  if (shouldLog) {
+    const effectiveSpeed = progressionRate / deltaTime;
+    const estimatedDuration = (nodeCount / effectiveSpeed) / 1000;
+    console.log(
+      `🐍 SNAKE v4.0 [${pathType}]: speed=${effectiveSpeed.toFixed(8)}/ms, ` +
+      `estimated_cycle=${estimatedDuration.toFixed(1)}s, ` +
+      `masterSpeed=${masterSpeedMultiplier.toFixed(4)}x`
+    );
+  }
+  
+  // Proper wraparound ensuring continuous animation
   if (nextIndex >= nodeCount - 1) {
     nextIndex = 0;
-    console.log(`Path ${pathType} completed cycle, resetting from ${currentIndex} to 0`);
+    console.log(`🔁 Snake Wraparound: ${pathType} path cycled`);
   }
   
   return nextIndex;
@@ -65,8 +87,27 @@ export const updatePathProperties = (
   path: EnhancedSnakePath,
   heroGlowIntensity: number
 ): { opacity: number; glowIntensity: number } => {
-  return {
-    opacity: Math.min(Math.max(path.opacity + heroGlowIntensity * 0.3, 0.7), 1),
-    glowIntensity: Math.min(Math.max(path.glowIntensity + heroGlowIntensity * 0.5, 0.8), 2.5)
-  };
+  const opacity = Math.min(
+    Math.max(
+      path.opacity + heroGlowIntensity * FIBER_ANIMATION_TOKENS.glow.heroPathBoost, 
+      FIBER_ANIMATION_TOKENS.opacity.path.base
+    ), 
+    FIBER_ANIMATION_TOKENS.opacity.path.max
+  );
+  
+  const glowIntensity = Math.min(
+    Math.max(
+      path.glowIntensity + heroGlowIntensity * FIBER_ANIMATION_TOKENS.glow.heroBoost, 
+      FIBER_ANIMATION_TOKENS.glow.base
+    ), 
+    FIBER_ANIMATION_TOKENS.glow.max
+  );
+  
+  // Log property updates periodically
+  const shouldLog = Math.random() < 0.01; // ~1% of frames
+  if (shouldLog) {
+    console.log(`✨ Path Properties: opacity=${opacity.toFixed(3)}, glow=${glowIntensity.toFixed(3)}, heroBoost=${heroGlowIntensity.toFixed(2)}`);
+  }
+  
+  return { opacity, glowIntensity };
 };

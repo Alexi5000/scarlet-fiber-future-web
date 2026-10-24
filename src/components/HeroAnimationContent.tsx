@@ -7,28 +7,32 @@ const HeroAnimationContent = ({ setIsModalOpen }: { setIsModalOpen: (isOpen: boo
     <div className="relative z-10 flex items-center justify-center min-h-screen px-4">
       <div className="text-center max-w-6xl mx-auto">
         <div className="mb-12">
-          <h1 className="text-5xl md:text-7xl font-bold text-white mb-10 tracking-tight animate-fade-in leading-relaxed py-6">
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-white via-buckeye-scarlet to-white animate-text-shimmer bg-[length:200%_100%] pb-2" style={{ 
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent'
-            }}>
-              Connecting the Future,
+          <h1 className="text-5xl md:text-7xl font-bold text-white mb-10 tracking-tight leading-relaxed py-6">
+            <span
+              className="block text-transparent bg-clip-text bg-gradient-to-r from-white via-buckeye-scarlet to-white pb-2"
+              style={{
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              }}
+            >
+              Fiber Optic Infrastructure
             </span>
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-white via-buckeye-scarlet to-white animate-text-shimmer bg-[length:200%_100%] animation-delay-500 pb-2" style={{ 
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent'
-            }}>
-              Powering Tomorrow.
+            <span
+              className="block text-transparent bg-clip-text bg-gradient-to-r from-white via-buckeye-scarlet to-white pb-2"
+              style={{
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              }}
+            >
+              for Ohio Enterprise
             </span>
           </h1>
-          
-          <div className="h-px w-32 mx-auto bg-gradient-to-r from-transparent via-buckeye-scarlet to-transparent animate-pulse" />
         </div>
-        
-        <p className="text-xl md:text-2xl text-buckeye-scarlet mb-12 animate-fade-in-delay max-w-3xl mx-auto font-light">
+
+        <p className="text-xl md:text-2xl text-buckeye-scarlet mb-12 max-w-3xl mx-auto font-light">
           Experience lightning-fast connectivity with our enterprise-grade fiber network solutions.
         </p>
-        
+
         <button
           className="relative px-16 py-6 font-medium overflow-hidden group animate-fade-in-delay-2 rounded-md"
           onMouseEnter={() => setIsButtonHovered(true)}

@@ -1,47 +1,50 @@
-
 import React from 'react';
 import Navbar from '../components/Navbar';
 import Hero from '../components/Hero';
 import StatsStrip from '../components/StatsStrip';
 import Services from '../components/Services';
+import IndustriesStrip from '../components/IndustriesStrip';
 import WhyChooseUs from '../components/WhyChooseUs';
+import TestimonialsHome from '../components/TestimonialsHome';
+import PortfolioTeaser from '../components/PortfolioTeaser';
 import SimpleCTA from '../components/SimpleCTA';
 import Footer from '../components/Footer';
-import ScrollIndicator from '../components/ScrollIndicator';
+
+import SEO from '../components/SEO';
+import { LocalBusinessSchema, BreadcrumbSchema } from '../components/StructuredData';
+import { SEO_CONFIG } from '../config/seo';
 
 const Index = ({ setIsModalOpen }: { setIsModalOpen: (isOpen: boolean) => void }) => {
   return (
     <div className="min-h-screen overflow-x-hidden">
+      <SEO
+        title={SEO_CONFIG.pages.home.title}
+        description={SEO_CONFIG.pages.home.description}
+        keywords={SEO_CONFIG.pages.home.keywords}
+        canonicalUrl="/"
+      />
+      <LocalBusinessSchema />
+      <BreadcrumbSchema items={[{ name: 'Home', url: '/' }]} />
+
       <Navbar />
-      <ScrollIndicator />
       
-      {/* First Viewport: Hero + Navigation */}
-      <section id="hero-section" className="h-screen relative">
-        <Hero setIsModalOpen={setIsModalOpen} />
-      </section>
-      
-      {/* Second Viewport: Stats + Services */}
-      <section id="services-section" className="h-screen relative bg-gradient-to-b from-gray-50 to-white">
-        <div className="h-1/3">
+
+      <main id="main-content">
+        <section id="hero-section" className="relative min-h-dvh">
+          <Hero setIsModalOpen={setIsModalOpen} />
+        </section>
+
+        <div id="services-section">
           <StatsStrip />
-        </div>
-        <div className="h-2/3 flex items-center">
           <Services />
         </div>
-      </section>
-      
-      {/* Third Viewport: Why Choose Us + CTA + Footer */}
-      <section id="final-section" className="h-screen relative bg-gradient-to-b from-white to-gray-50">
-        <div className="h-1/2 flex items-center">
-          <WhyChooseUs />
-        </div>
-        <div className="h-1/4 flex items-center">
-          <SimpleCTA setIsModalOpen={setIsModalOpen} />
-        </div>
-        <div className="h-1/4">
-          <Footer />
-        </div>
-      </section>
+        <IndustriesStrip />
+        <WhyChooseUs />
+        <TestimonialsHome />
+        <PortfolioTeaser />
+        <SimpleCTA setIsModalOpen={setIsModalOpen} />
+      </main>
+      <Footer />
     </div>
   );
 };
